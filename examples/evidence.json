@@ -1,0 +1,19 @@
+{
+  "evidence_id": "EV-000001",
+  "experiment_id": "EX-1",
+  "paper_id": "P-000001",
+  "claim_id": "C1",
+  "verification_state": "PRIMARY_SOURCE_REVIEWED",
+  "primary_source": "SYNTHETIC teaching fixture; no actual paper",
+  "manipulation": "Cache policy A versus B",
+  "comparison": "Equal memory budgets",
+  "held_constants": "Memory budget and workload",
+  "observable": "Cache misses",
+  "criteria_json": "{\"intervention\":\"YES\",\"controlled_budget\":\"YES\",\"outcome\":\"YES\",\"workload_shift\":\"UNKNOWN\"}",
+  "equivalence_score": "4",
+  "evidence_quote": "SYNTHETIC: policy A recorded fewer misses at the same memory budget.",
+  "evidence_location": "Synthetic fixture, example table 1",
+  "coder_inference": "The controlled comparison matches C1; no workload-shift evidence establishes C2.",
+  "uncertainty": "Teaching data only; this is not a literature finding.",
+  "status": "PARTIALLY_PRECEDED"
+}

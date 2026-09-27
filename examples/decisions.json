@@ -1,0 +1,13 @@
+{
+  "batch_id": "BATCH-001",
+  "reviewed_date": "2025-12-31",
+  "adjudication_timestamp": "2025-12-31T12:00:00Z",
+  "decisions": [{
+    "evidence_id": "EV-000001",
+    "decision": "ACCEPT",
+    "status": "PARTIALLY_PRECEDED",
+    "score": 4,
+    "reason": "SYNTHETIC demo decision; the controlled comparison supports the limited classification.",
+    "adjudicator": "Synthetic demo reviewer"
+  }]
+}

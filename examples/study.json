@@ -1,0 +1,15 @@
+{
+  "study_id": "DEMO-SEARCH-001",
+  "title": "Synthetic example: cache replacement policies",
+  "cutoff_date": "2025-12-31",
+  "claims": [
+    {"id": "C1", "text": "Under a fixed memory budget, policy A reduces cache misses compared with policy B on a specified workload."},
+    {"id": "C2", "text": "The advantage persists under a workload shift while the memory budget remains fixed."}
+  ],
+  "criteria": {
+    "intervention": "Does the experiment change the cache replacement policy?",
+    "controlled_budget": "Is the memory budget held constant?",
+    "outcome": "Are cache misses measured directly?",
+    "workload_shift": "Is the same comparison repeated after a documented workload shift?"
+  }
+}
