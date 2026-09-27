@@ -1,0 +1,11 @@
+{
+  "purpose": "Remove third-party public email addresses embedded in unrelated bibliographic metadata. No titles, identifiers, or evidence changed. All other response bytes retained.",
+  "files": [
+    {
+      "path": "snapshot/data/searches/raw/R-S1-000004/page-0001.openalex.json",
+      "original_sha256": "8a5512cb3ce4494ff7aca889480761e73a8df10b9be39a5d9bd717b016a0bfd2",
+      "redacted_sha256": "4f62d763d73c51e0ad5c425fe4ad025d08c1cc5d331267d39d1cfc889b364999",
+      "replacements": 2
+    }
+  ]
+}

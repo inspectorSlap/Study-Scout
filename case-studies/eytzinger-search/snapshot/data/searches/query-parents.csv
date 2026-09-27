@@ -1,0 +1,3 @@
+parent_link_id,query_id,parent_type,parent_id,relation,round_id,created_date,notes
+QP-S1-000001,Q-S1-000004,QUERY,Q-S1-000003,DERIVED_FROM,,2026-09-27,"Figure 21 compares Btree, not sorted binary search; targeted check for the missing comparator."
+QP-S1-000002,Q-S1-000004,PAPER,P-000012,DERIVED_FROM,,2026-09-27,"Figure 21 compares Btree, not sorted binary search; targeted check for the missing comparator."

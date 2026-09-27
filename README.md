@@ -29,7 +29,17 @@ python3 scripts/demo.py --workspace ./workspace/demo
 python3 -m unittest discover -s tests -v
 ```
 
-The demo creates a new workspace and refuses to overwrite an existing one. All included papers, evidence, and reviewer decisions are explicitly synthetic. **No network requests occur.** Open `workspace/demo/data/synthesis/matrix.md` afterward.
+The demo creates a new workspace and refuses to overwrite an existing one. All papers, evidence, and reviewer decisions produced by this synthetic demo are explicitly fictional. **No network requests occur.** Open `workspace/demo/data/synthesis/matrix.md` afterward.
+
+## A real computing case study
+
+[**Eytzinger search: a strong precedent and a comparator trap**](case-studies/eytzinger-search/README.md) follows two narrow performance claims through live retrieval and primary-source inspection. It includes actual API failures, unresolved leads, and pending human reviews. No performance benchmark was rerun.
+
+```sh
+python3 scripts/replay_case.py --case case-studies/eytzinger-search --workspace workspace/eytzinger-replay
+```
+
+This offline replay verifies the recorded snapshot and reproduces its matrix and stopping report. It does not repeat the literature search. Read the case's scope limits before treating it as a research conclusion.
 
 ## Start a real study
 

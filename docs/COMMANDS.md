@@ -295,3 +295,7 @@ options:
 ## Exit status
 
 Validation and stopping-checker exit 1 on inconsistent records. A successful stopping check may still report NOT SATISFIED. API execution exits 1 for provider failure/access blocks; a bounded page-limit result can exit 0 while remaining incomplete. Argument errors exit 2. Freeze/integrity failures stop the operation with a nonzero status.
+
+## Replay a published case
+
+`python3 scripts/replay_case.py --case case-studies/eytzinger-search --workspace workspace/eytzinger-replay` verifies hashes, copies the snapshot to a new workspace, validates the records, and reproduces the recorded outputs. It makes no network calls and refuses to overwrite an existing destination. Hashes check consistency, not authenticity.

@@ -21,3 +21,7 @@ Public preparation: 0.1.0.
 - Exhaustiveness of semantic privacy review: inspect the staged public files before the first push.
 
 CI is configured for Python 3.10, 3.12, and 3.14 on Ubuntu. That configuration will run once pushed; it is not a claim that those hosted runs have already passed.
+
+## Real-case addition (2026-09-27)
+
+All 23 offline unittest checks passed locally on Python 3.14. The additional tests verify byte-for-byte regeneration of the real case outputs, refusal to overwrite an existing workspace, changed/unmanifested snapshot rejection, and manifest path containment. This validates the toolkit mechanics, not the correctness or completeness of research judgments. The two mandatory reviews remain pending and the stopping condition remains NOT SATISFIED.

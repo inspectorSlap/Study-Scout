@@ -1,0 +1,122 @@
+[
+  {
+    "script": "api_search.py",
+    "args": [
+      "--source",
+      "crossref",
+      "--query-id",
+      "Q-S1-000001",
+      "--execution-id",
+      "R-S1-000001",
+      "--page-size",
+      "10",
+      "--max-pages",
+      "1",
+      "--filters",
+      "cutoff=2026-09-27; annotation only; screening applied separately"
+    ],
+    "exit_code": 0,
+    "stdout": "R-S1-000001: 10 results, 1 page(s), terminal=PAGE_LIMIT_REACHED\n",
+    "stderr": ""
+  },
+  {
+    "script": "api_search.py",
+    "args": [
+      "--source",
+      "openalex",
+      "--query-id",
+      "Q-S1-000001",
+      "--execution-id",
+      "R-S1-000002",
+      "--page-size",
+      "10",
+      "--max-pages",
+      "1",
+      "--filters",
+      "cutoff=2026-09-27; annotation only; screening applied separately"
+    ],
+    "exit_code": 0,
+    "stdout": "R-S1-000002: 10 results, 1 page(s), terminal=PAGE_LIMIT_REACHED\n",
+    "stderr": ""
+  },
+  {
+    "script": "api_search.py",
+    "args": [
+      "--source",
+      "crossref",
+      "--query-id",
+      "Q-S1-000002",
+      "--execution-id",
+      "R-S1-000003",
+      "--page-size",
+      "10",
+      "--max-pages",
+      "1",
+      "--filters",
+      "cutoff=2026-09-27; annotation only; screening applied separately"
+    ],
+    "exit_code": 0,
+    "stdout": "R-S1-000003: 10 results, 1 page(s), terminal=PAGE_LIMIT_REACHED\n",
+    "stderr": ""
+  },
+  {
+    "script": "api_search.py",
+    "args": [
+      "--source",
+      "openalex",
+      "--query-id",
+      "Q-S1-000002",
+      "--execution-id",
+      "R-S1-000004",
+      "--page-size",
+      "10",
+      "--max-pages",
+      "1",
+      "--filters",
+      "cutoff=2026-09-27; annotation only; screening applied separately"
+    ],
+    "exit_code": 0,
+    "stdout": "R-S1-000004: 10 results, 1 page(s), terminal=PAGE_LIMIT_REACHED\n",
+    "stderr": ""
+  },
+  {
+    "script": "api_search.py",
+    "args": [
+      "--source",
+      "crossref",
+      "--query-id",
+      "Q-S1-000003",
+      "--execution-id",
+      "R-S1-000005",
+      "--page-size",
+      "10",
+      "--max-pages",
+      "1",
+      "--filters",
+      "cutoff=2026-09-27; annotation only; screening applied separately"
+    ],
+    "exit_code": 0,
+    "stdout": "R-S1-000005: 10 results, 1 page(s), terminal=PAGE_LIMIT_REACHED\n",
+    "stderr": ""
+  },
+  {
+    "script": "api_search.py",
+    "args": [
+      "--source",
+      "openalex",
+      "--query-id",
+      "Q-S1-000003",
+      "--execution-id",
+      "R-S1-000006",
+      "--page-size",
+      "10",
+      "--max-pages",
+      "1",
+      "--filters",
+      "cutoff=2026-09-27; annotation only; screening applied separately"
+    ],
+    "exit_code": 1,
+    "stdout": "R-S1-000006: 0 results, 0 page(s), terminal=RATE_LIMITED\n",
+    "stderr": ""
+  }
+]

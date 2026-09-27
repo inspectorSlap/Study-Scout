@@ -1,0 +1,5 @@
+query_id,stage,query_origin,seed_id,parent_query_id,parent_paper_id,parent_edge_id,expansion_round_id,generation,track,claim_ids,query_text,created_date,created_by,notes
+Q-S1-000001,STAGE_1_COLD,SEED,SQ-001,,,,,0,layout,C1;C2,Eytzinger binary search prefetch array layout,2026-09-27,FROZEN_SEED_IMPORT,Exact copy of the checksum-frozen StudyScout seed.
+Q-S1-000002,STAGE_1_COLD,SEED,SQ-002,,,,,0,experimental-shape,C1;C2,breadth first search tree layout sorted array cache benchmark,2026-09-27,FROZEN_SEED_IMPORT,Exact copy of the checksum-frozen StudyScout seed.
+Q-S1-000003,STAGE_1_COLD,SEED,SQ-003,,,,,0,concurrency,C2,Eytzinger concurrent multithreaded search memory bandwidth,2026-09-27,FROZEN_SEED_IMPORT,Exact copy of the checksum-frozen StudyScout seed.
+Q-S1-000004,STAGE_1_COLD,EXPERIMENTAL_SHAPE,,Q-S1-000003,P-000012,,,1,concurrency-baseline,C2,"Eytzinger ""binary search"" ""threads"" benchmark",2026-09-27,agent,"Figure 21 compares Btree, not sorted binary search; targeted check for the missing comparator."

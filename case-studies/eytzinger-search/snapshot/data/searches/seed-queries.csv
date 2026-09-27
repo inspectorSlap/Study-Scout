@@ -1,0 +1,4 @@
+seed_id,track,ordinal,claim_ids,query_text,freeze_date
+SQ-001,layout,1,C1;C2,Eytzinger binary search prefetch array layout,2026-09-27
+SQ-002,experimental-shape,2,C1;C2,breadth first search tree layout sorted array cache benchmark,2026-09-27
+SQ-003,concurrency,3,C2,Eytzinger concurrent multithreaded search memory bandwidth,2026-09-27

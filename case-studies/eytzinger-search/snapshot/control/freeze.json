@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "frozen_at": "2026-09-27T04:01:26.884513+00:00",
+  "sha256": {
+    "study.json": "13bc8dfd869b565a68308ad63f1ea503940f63230e859df80d72934a218d865b",
+    "control/SOURCE_REGISTER.csv": "fa7eceb2cccecfa3340a00c3ec21f31482691c966821adf2c363738217ee1b8c",
+    "data/searches/seed-queries.csv": "48bcaceb334ad3429ab9ed3eba97164de613fa16b32022f375213f4706005cda"
+  }
+}

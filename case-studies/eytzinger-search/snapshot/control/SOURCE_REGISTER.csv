@@ -1,0 +1,5 @@
+source_id,source_name,access_method,cold_allowed
+S-01,OpenAlex,API,TRUE
+S-02,Crossref,API,TRUE
+S-06,Public web discovery,WEB_SEARCH,TRUE
+S-07,Primary-source inspection,BROWSER,TRUE

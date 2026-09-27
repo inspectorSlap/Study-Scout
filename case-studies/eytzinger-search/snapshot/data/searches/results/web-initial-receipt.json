@@ -1,0 +1,12 @@
+{
+  "date_utc": "2026-09-27",
+  "timestamp_precision": "date only; exact original web-call timestamp not retained",
+  "provider": "web search tool",
+  "query_ids": [
+    "Q-S1-000001",
+    "Q-S1-000002",
+    "Q-S1-000003"
+  ],
+  "returned_visible_hits": 39,
+  "capture": "Merged batch order; not a provider rank or an exhaustive index export. Article snippets and full text omitted."
+}

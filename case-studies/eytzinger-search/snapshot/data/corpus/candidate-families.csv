@@ -1,0 +1,2 @@
+family_id,label,definition_basis,first_seen_round_id,created_date,provenance_stage,notes
+FAM-001,Khuong and Morin array layouts,Same title/authors; arXiv record identifies journal revision.,,2026-09-27,STAGE_1_COLD,P-000011 journal and P-000012 preprint are one family. No double-counted replication.

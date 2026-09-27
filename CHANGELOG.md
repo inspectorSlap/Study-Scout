@@ -9,3 +9,8 @@
 - Added MIT licensing and private-workspace defaults.
 
 This is a first public toolkit preparation, not a release of any underlying research study or a claim of completed live-provider certification.
+
+## Unreleased
+
+- Added a bounded Eytzinger literature-search case study with live retrieval receipts, primary-evidence comparison, pending review, and explicit coverage limits.
+- Added offline snapshot verification and deterministic replay.

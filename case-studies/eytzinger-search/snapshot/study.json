@@ -1,0 +1,23 @@
+{
+  "study_id": "EYTZINGER-SEARCH-2026-09-27-v1",
+  "title": "Does an Eytzinger array make static key lookup faster?",
+  "cutoff_date": "2026-09-27",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "For static ordered keys in RAM, an Eytzinger (breadth-first) array layout with branch-free traversal and software prefetching can outperform an optimized sorted-array binary search for single-threaded point queries when the data exceed the last-level cache."
+    },
+    {
+      "id": "C2",
+      "text": "The same Eytzinger-plus-prefetch implementation retains a throughput advantage over optimized sorted-array binary search when multiple reader threads execute independent point queries concurrently on the same static RAM-resident key set exceeding the last-level cache."
+    }
+  ],
+  "criteria": {
+    "layout": "Is the tested layout a breadth-first Eytzinger array?",
+    "prefetch": "Does the measured implementation use software prefetching and branch-free traversal?",
+    "baseline": "Is the comparator an optimized sorted-array binary search, not merely an unoptimized baseline?",
+    "working_set": "Are static keys RAM-resident and is a measured case larger than last-level cache?",
+    "measurement": "Are query latency or throughput actually measured, with hardware and workload described?",
+    "concurrency": "Are multiple independent reader threads tested on the shared static data structure?"
+  }
+}
