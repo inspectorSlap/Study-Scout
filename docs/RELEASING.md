@@ -1,5 +1,7 @@
 # Publishing StudyScout
 
+The public repository is already initialized. The first-push steps below are retained for new exports and forks; do not rerun them against this repository.
+
 The intended public repository name is **Study-Scout**; the product name is **StudyScout**.
 
 This export contains selected generalized code, new documentation, empty-workspace initialization, and synthetic fixtures. It does not include the source research repository's Git history, claims, search corpus, reviewer records, study reports, raw provider responses, or credentials.

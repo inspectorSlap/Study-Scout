@@ -20,7 +20,7 @@ Public preparation: 0.1.0.
 - Concurrent-writer safety or transactional recovery across CSV files.
 - Exhaustiveness of semantic privacy review: inspect the staged public files before the first push.
 
-CI is configured for Python 3.10, 3.12, and 3.14 on Ubuntu. That configuration will run once pushed; it is not a claim that those hosted runs have already passed.
+CI is configured for Python 3.10, 3.12, and 3.14 on Ubuntu. The checks passed on the public main branch before the first tagged release.
 
 ## Real-case addition (2026-09-27)
 
