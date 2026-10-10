@@ -8,6 +8,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from rig_common import CLAIM_IDS, DATA, ROOT, read_csv
+from report_scope import scope_lines
 
 
 ORDER = {"PRECEDED": 5, "PARTIALLY_PRECEDED": 4, "ADJACENT": 3, "UNCERTAIN": 2, "NOT_RELEVANT": 1}
@@ -41,6 +42,7 @@ def main() -> int:
     lines = [
         "# StudyScout Cross-Claim Matrix", "",
         "Each cell shows the highest-equivalence evidence record. Mandatory judgments remain provisional until human adjudication.", "",
+        *scope_lines(list(candidates.values()), evidence),
         "| Paper | " + " | ".join(CLAIM_IDS) + " |",
         "|---|" + "---|" * len(CLAIM_IDS),
     ]
@@ -65,8 +67,7 @@ def main() -> int:
         lines.append(f"| {paper_id} — {escape(title)} | " + " | ".join(rendered) + " |")
     if not paper_ids:
         lines.append("| _No evidence coded_ | " + " | ".join("—" for _ in CLAIM_IDS) + " |")
-    pending = sum(row["manual_review_required"] == "TRUE" and row["manual_review_status"] in {"PENDING", "NEEDS_SOURCE"} for row in evidence)
-    lines.extend(["", f"Pending mandatory human reviews: **{pending}**", ""])
+    lines.append("")
     text = "\n".join(lines)
     if args.stdout or not args.output:
         print(text, end="")

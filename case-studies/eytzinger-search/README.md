@@ -4,6 +4,8 @@
 
 Eytzinger layout stores a binary search tree breadth-first in an array. The question here is deliberately narrower than “is it fast?”: does the literature test a specific implementation, comparator, working-set size, and concurrency setting?
 
+**Read the results within these bounds:** 49 candidate records include 13 awaiting full text. Of eight recorded retrieval executions, five hit a page limit, two were manually stopped, and one was rate-limited. Two human reviews remain pending; no expansion rounds were completed, and stopping is **NOT SATISFIED**. The findings below are provisional judgments about inspected sources, not a completeness claim.
+
 ## What the run found
 
 | Frozen claim | Agent proposal | Why |

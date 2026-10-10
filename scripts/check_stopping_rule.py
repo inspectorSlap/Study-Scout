@@ -9,6 +9,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from rig_common import DATA, read_csv
+from report_scope import scope_lines
 
 
 def main() -> int:
@@ -79,6 +80,7 @@ def main() -> int:
         "",
         f"Status: **{'SATISFIED' if satisfied else 'NOT SATISFIED'}**",
         "",
+        *scope_lines(candidates, evidence),
         "| Round | Complete | Machine-null |",
         "|---|---:|---:|",
     ]

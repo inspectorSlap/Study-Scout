@@ -9,7 +9,7 @@
     "HACKER-NEWS-DRAFT.md": "146849a6759641b5791db06115e66c33504008bba14413232fa3e93794e3d6ed",
     "PROTOCOL.md": "5eb82aa6e930ad49aa4c28f9e6ecc394db2d58f8d36ba3278ac9e4fe4b84dbcc",
     "PROTOCOL.sha256": "11bbd6551b4986d199d336a66d313c8c8aee2bbad3763599f9538b62955f75f3",
-    "README.md": "51369dd1585547ba92e74c16f91ddde7588e642ab1538c841f0f660a59e6749c",
+    "README.md": "0e8f0a640e5da06f3c5930852f3a484b5eb6fb3382aef267a043b434bf0e6a3b",
     "REDACTIONS.json": "65c308428a19b923f42fd345a89205a8503411c0639f093d9a3b1c3c790ebe90",
     "REPORT.md": "0693a62c8dc64102930172f86a9c9a66424dafcde3e25abb74f22cf9ebdcf69d",
     "SOURCE-ACCESS.md": "e9a91fd2ab4aff47ed1e3f0dd5e4bebb500b08c38b4e3a6f186d44a482db6561",
@@ -46,8 +46,8 @@
     "snapshot/data/searches/round-triggers.csv": "221832d858227102effb94e69061f8f2c4f4c1a6a50a57a3e5ecc19af5d9cdd1",
     "snapshot/data/searches/search-log.csv": "9a5980138f79efdc9cf91434d97922b433bb8ff45a0bd50edf14da8ac2e9cb87",
     "snapshot/data/searches/seed-queries.csv": "48bcaceb334ad3429ab9ed3eba97164de613fa16b32022f375213f4706005cda",
-    "snapshot/data/synthesis/matrix.md": "873586a15729f023b269c9919f64978d7e8e506c59fc1d8c17686cfd76902059",
-    "snapshot/data/synthesis/stopping.md": "702ec4ec0249d39ecb05607e0be9f3b183d01925f113c3ca233d2c14ff432002",
+    "snapshot/data/synthesis/matrix.md": "1b2009b805a23e040a5a1de2701e80cc93b247b74a0a718f83a99719b2fe9c04",
+    "snapshot/data/synthesis/stopping.md": "77a8f83b816e5c913bb355337a0c45e33579ff2934dcf698daaeb11b0a498a5a",
     "snapshot/study.json": "13bc8dfd869b565a68308ad63f1ea503940f63230e859df80d72934a218d865b",
     "study.json": "13bc8dfd869b565a68308ad63f1ea503940f63230e859df80d72934a218d865b"
   }
