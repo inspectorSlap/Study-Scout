@@ -6,7 +6,7 @@ import json
 import re
 from datetime import date
 from pathlib import Path
-from schemas import SCHEMAS
+from schemas import SCHEMAS, OPTIONAL_SCHEMAS
 
 SOURCE_FIELDS = ['source_id', 'source_name', 'access_method', 'cold_allowed']
 SOURCES = [('S-01', 'OpenAlex'), ('S-02', 'Crossref'), ('S-03', 'Semantic Scholar Graph'), ('S-04', 'arXiv'), ('S-05', 'DBLP')]
@@ -37,7 +37,7 @@ def main():
         parser.error('workspace already exists; refusing to overwrite')
     args.workspace.mkdir(parents=True)
     (args.workspace / 'study.json').write_text(json.dumps(config, indent=2) + '\n')
-    for relative, fields in SCHEMAS.items():
+    for relative, fields in {**SCHEMAS, **OPTIONAL_SCHEMAS}.items():
         path = args.workspace / 'data' / relative
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open('w', newline='') as handle:

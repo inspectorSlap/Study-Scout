@@ -47,6 +47,15 @@ Verify frozen study specification, source policy, and seed query bytes.
 python3 scripts/release_guard.py
 ```
 
+## `seal_study.py`
+
+After the final report, hash every workspace file except the seal itself and an optional `.git` directory. Verify later against the exact file set and bytes. This is a consistency check, not independent proof of the research process.
+
+```sh
+python3 scripts/seal_study.py
+python3 scripts/seal_study.py --verify
+```
+
 ## `register_seed_set.py`
 
 Register the checksum-frozen StudyScout seeds with deterministic Stage 1 query IDs.
@@ -113,7 +122,7 @@ options:
   --execution-id EXECUTION_ID
   --page-size PAGE_SIZE
   --max-pages MAX_PAGES
-  --filters FILTERS     Annotation only; does not filter provider results
+  --filters FILTERS     Reserved; nonempty values are rejected because provider filters are not implemented
 ```
 
 ## `log_retrieval.py`

@@ -77,3 +77,14 @@ def sha256(path: Path) -> str:
 
 def split_claim_ids(value: str) -> set[str]:
     return {item.strip() for item in value.replace("|", ";").split(";") if item.strip()}
+
+
+def effective_judgment(row: dict[str, str]) -> tuple[int, str]:
+    """Return the human decision when present, otherwise the agent proposal."""
+    if row["adjudication_authority"] == "HUMAN_ADJUDICATED":
+        return int(row["adjudicated_equivalence_score"]), row["adjudicated_status"]
+    return int(row["equivalence_score"]), row["status"]
+
+
+def review_required(row: dict[str, str]) -> bool:
+    return int(row["equivalence_score"]) >= 4 or row["status"] in {"PRECEDED", "PARTIALLY_PRECEDED"}

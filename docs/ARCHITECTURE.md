@@ -20,10 +20,11 @@ query genealogy -> API/manual retrieval -> raw files + execution ledger
 
 - `rig_common.py`: workspace selection, study configuration, enums, and CSV helpers.
 - `schemas.py`: exact column order and identifier patterns. This is the schema authority.
-- `init_study.py`, `freeze_study.py`, `release_guard.py`: workspace creation and control integrity.
+- `init_study.py`, `freeze_study.py`, `release_guard.py`: workspace creation and pre-search control integrity.
+- `seal_study.py`: post-report hashing and verification of the full workspace file set.
 - Query, retrieval, ingestion, and review scripts: small command-line operations over explicit files.
 - `validate_records.py`: configuration, schema, relationship, and review checks.
-- `check_stopping_rule.py`: a separate check of expansion-round declarations.
+- `check_stopping_rule.py`: a separate check of expansion-round declarations against linked retrieval and effective human decisions.
 - `api_search.py`: provider URL builders, parsers, bounded sequential requests, and execution logging.
 
 The search toolkit does not implement the separate two-agent software-testing harness. Its agent brief supports a human-supervised literature workflow.
@@ -36,7 +37,7 @@ Edit the `criteria` object before freezing. Include exactly those names in each 
 
 For a manual source, add a source-register row before freeze and use `log_retrieval.py`. For an API adapter, add a URL builder and a parser returning `Page`, then register a `Source` in `api_search.py` and add it to initialization's source list. Maintain the normalized result header. Add offline tests for an empty page, a populated page, continuation, truncation, and error responses. Read the provider's current documentation before enabling live use.
 
-Never log authorization headers or credential-bearing URLs. Preserve a failure as a failure. Do not infer source exhaustion from a rate limit or local page budget. New schema fields require changes to schemas, writers, validators, examples, tests, and documentation together.
+Never log authorization headers or credential-bearing URLs. New API receipts retain the effective query with `mailto` redacted and hash returned raw bytes. Preserve a failure as a failure. Do not infer source exhaustion from a rate limit or local page budget. New schema fields require changes to schemas, writers, validators, examples, tests, and documentation together.
 
 ## Operational boundaries
 

@@ -13,8 +13,9 @@ The goal is to identify the strongest precedent for a claim. StudyScout delibera
 - Retrieves bibliographic metadata through five source adapters.
 - Deduplicates candidate records while preserving individual discovery routes.
 - Records experiment-level evidence against your own criteria.
-- Routes high-equivalence and `PRECEDED` proposals to human review.
-- Produces a paper-by-claim matrix and checks declared expansion-round counts.
+- Routes high-equivalence, `PRECEDED`, and `PARTIALLY_PRECEDED` proposals to human review.
+- Produces a paper-by-claim matrix with its recorded search bounds beside the findings.
+- Checks expansion rounds against linked retrieval executions and can seal the final study workspace.
 
 This is a **v0.1 command-line research toolkit**. It does not autonomously read and adjudicate papers, prove novelty, provide patent clearance, or enforce agent isolation. You can use it manually or with an agent that can operate local files and inspect literature.
 
@@ -39,7 +40,7 @@ The demo creates a new workspace and refuses to overwrite an existing one. All p
 python3 scripts/replay_case.py --case case-studies/eytzinger-search --workspace workspace/eytzinger-replay
 ```
 
-This offline replay verifies the recorded snapshot and reproduces its matrix and stopping report. It does not repeat the literature search. Read the case's scope limits before treating it as a research conclusion.
+This offline replay verifies the recorded snapshot and reproduces its matrix and stopping report. It does not repeat the literature search. The case has unresolved full-text leads, pending reviews, and no completed expansion rounds; read its scope limits before treating it as a research conclusion.
 
 ## Start a real study
 
@@ -67,7 +68,7 @@ See the [implementation guide](docs/IMPLEMENTATION.md) for the complete command 
 
 Adapters are included for OpenAlex, Crossref, Semantic Scholar, arXiv, and DBLP. Live availability, credentials, and rate limits depend on the provider. Read [provider notes](docs/IMPLEMENTATION.md#provider-notes) before making requests. Search text is transmitted to the provider you select.
 
-StudyScout saves raw responses and normalized metadata in the research workspace. Full-text inspection and evidence coding are separate steps. The configured cutoff date must be checked during screening; the adapters do not automatically enforce it.
+StudyScout saves raw responses and normalized metadata in the research workspace. New API executions record the effective request with contact email redacted and hashes of raw payloads. Full-text inspection and evidence coding are separate steps. The configured cutoff date must be checked during screening; the adapters do not automatically enforce exact publication dates.
 
 ## Development
 

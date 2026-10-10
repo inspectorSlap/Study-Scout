@@ -32,6 +32,8 @@ Primary identifier: `execution_id`; pattern: `R-S[12]-\d{6}`.
 
 Columns: `execution_id`, `query_id`, `stage`, `source_id`, `source_name`, `access_method`, `parameters_json`, `filters`, `run_started_at`, `run_completed_at`, `requested_page_size`, `pagination_start`, `pagination_end`, `pages_retrieved`, `result_count`, `results_available`, `serious_candidate_count`, `api_failure`, `api_truncated`, `terminal_condition`, `status`, `raw_response_paths`, `normalized_result_paths`, `notes`.
 
+`status=COMPLETE` means the execution returned normally; only `terminal_condition` says whether the source was exhausted. New API executions store redacted effective request URLs and raw-response SHA-256 digests in `parameters_json`. An empty `serious_candidate_count` means it has not been assessed. `filters` on a manually logged run is an annotation, not evidence of provider-side filtering; the API adapter rejects a nonempty `--filters` argument.
+
 ### `data/searches/search-log.csv`
 
 Primary identifier: `event_id`; pattern: `E-\d{6}`.
@@ -66,6 +68,10 @@ Primary identifier: `paper_id`; pattern: `P-\d{6}`.
 
 Columns: `paper_id`, `title`, `authors`, `year`, `venue`, `url`, `doi`, `arxiv_id`, `source_found`, `stage`, `peer_reviewed`, `retrieved_date`, `verification_state`, `disposition`, `rejection_reason`, `first_seen_round_id`, `family_id`, `notes`.
 
+### `data/corpus/screening.csv` (optional for older workspaces)
+
+Columns: `paper_id`, `title`, `decision`, `basis`, `date_utc`. New workspaces include its header. When rows are present, validation checks unique candidate references and agreement with candidate dispositions. For exclusions, `basis` must match the candidate's `rejection_reason`. The candidate table remains authoritative, so a screening row is not a substitute for updating the candidate.
+
 ### `data/corpus/discoveries.csv`
 
 Primary identifier: `discovery_id`; pattern: `D-\d{6}`.
@@ -86,14 +92,14 @@ Columns: `evidence_id`, `experiment_id`, `paper_id`, `claim_id`, `stage`, `title
 
 ## Evidence and review
 
-One evidence row links one paper, experiment, and claim. `criteria_json` is a JSON object serialized inside a CSV cell, covering every configured criterion. Use the JSON importer to avoid hand-escaping errors. Scores are strings from 0 through 5. Allowed statuses are PRECEDED, PARTIALLY_PRECEDED, ADJACENT, NOT_RELEVANT, and UNCERTAIN.
+One evidence row links one paper, experiment, and claim; the triple must be unique. `experiment_id` is a stable label within a paper, not an independent registry. This version's evidence row is designed for experimental loci; methods, patents, and textbooks without an experiment need an explicit future schema extension. `criteria_json` is a JSON object serialized inside a CSV cell, covering every configured criterion with nonempty qualitative text. The values are not typed verdicts and should not be aggregated as if they were. Use the JSON importer to avoid hand-escaping errors. Scores are strings from 0 through 5. Allowed statuses are PRECEDED, PARTIALLY_PRECEDED, ADJACENT, NOT_RELEVANT, and UNCERTAIN. Record the exact inspected version in `primary_source` and `evidence_location`; `year` comes from candidate metadata and may be the year of an earlier version.
 
 `AGENT_PROVISIONAL` identifies a proposed judgment. `HUMAN_ADJUDICATED` records a supplied human decision; the software cannot authenticate the reviewer. Original status and score remain intact alongside adjudicated fields. Review history retains the preceding matrix and decision payload.
 
 ## Expansion rounds
 
-Stage 1 round IDs use `ROUND-S1-001`; candidate families use `FAM-001`. Record the trigger set prospectively. A coverage row marks backward, forward, author, and terminology paths COMPLETE only when actually completed. Preserve failed retrieval in the ledger. The stopping checker compares declared counts with candidate/evidence/family records and requires two consecutive complete null rounds. Empty trigger sets cannot qualify. This v0.1 stopping checker is intended for Stage 1; evaluate Stage 2 coverage separately.
+Stage 1 round IDs use `ROUND-S1-001`; candidate families use `FAM-001`. Record the trigger set prospectively. A coverage row marks backward, forward, author, and terminology paths COMPLETE only when actually completed. Link the round's queries using `expansion_round_id`, and preserve all source executions, including failures. The stopping checker compares declared counts with candidate/evidence/family records and requires two consecutive complete null rounds. Empty trigger sets, missing executions, and capped or failed linked executions cannot qualify. This checker is intended for Stage 1; evaluate Stage 2 coverage separately.
 
 ## Data not frozen automatically
 
-Candidate records, evidence, review histories, raw responses, and the cold-pass corpus are not included in the initial control freeze. Preserve private snapshots when making stage transitions or publishing reports. Files are single-writer CSVs, not a transactional database.
+Candidate records, evidence, review histories, raw responses, and the cold-pass corpus are not included in the initial control freeze. Run `seal_study.py` after a report is final to hash the full workspace. Preserve private snapshots when making stage transitions or publishing reports. Files are single-writer CSVs, not a transactional database.

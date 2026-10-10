@@ -24,4 +24,8 @@ CI is configured for Python 3.10, 3.12, and 3.14 on Ubuntu. The checks passed on
 
 ## Real-case addition (2026-09-27)
 
-All 23 offline unittest checks passed locally on Python 3.14. The additional tests verify byte-for-byte regeneration of the real case outputs, refusal to overwrite an existing workspace, changed/unmanifested snapshot rejection, and manifest path containment. This validates the toolkit mechanics, not the correctness or completeness of research judgments. The two mandatory reviews remain pending and the stopping condition remains NOT SATISFIED.
+At the original real-case release, all 23 offline unittest checks passed locally on Python 3.14. The additional tests verify byte-for-byte regeneration of the real case outputs, refusal to overwrite an existing workspace, changed/unmanifested snapshot rejection, and manifest path containment. This validates the toolkit mechanics, not the correctness or completeness of research judgments. The original two mandatory reviews remained pending and the stopping condition was NOT SATISFIED.
+
+## Audit hardening (2026-10-09)
+
+All 32 offline unittest checks pass locally on Python 3.14.7. New checks cover partial-precedence review, duplicate evidence loci, post-cutoff precedence, screening disagreement, missing primary sources, final-workspace seal verification, effective human scores in stopping, capped round retrieval, request redaction and payload hashes, rejected unapplied filters, and provider totals that contradict an exhaustion signal. The revised public case replays byte-for-byte with three pending mandatory reviews and stopping still NOT SATISFIED. These checks do not independently verify the literature findings or exercise expansion rounds against live providers.

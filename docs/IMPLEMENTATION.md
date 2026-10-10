@@ -25,7 +25,7 @@ Use `examples/study.json` as the structural template. Required fields are:
 - `claims`: an array of unique IDs and concrete claim text. IDs may contain letters, digits, hyphens, and underscores.
 - `criteria`: an object mapping criterion names to comparison questions.
 
-Phrase claims so that a prior experiment could contradict or precede them. Record what changes, what stays fixed, and what is measured. Custom criteria are saved for each evidence row in `criteria_json`; every configured criterion must be represented. Values can describe matches, absences, uncertainty, and supporting evidence. The software checks coverage of the configured names, not the truth of your judgments.
+Phrase claims so that a prior experiment could contradict or precede them. Record what changes, what stays fixed, and what is measured. Custom criteria are saved for each evidence row in `criteria_json`; every configured criterion must have a nonempty text value. These values are qualitative notes, not a controlled vocabulary or machine-comparable verdicts. The software checks coverage and presence, not the truth of your judgments.
 
 ## 3. Add seeds and freeze
 
@@ -64,7 +64,7 @@ python3 scripts/ingest_results.py --execution-id R-S1-000001
 python3 scripts/validate_records.py
 ```
 
-Execution IDs are unique. Each request records raw data, normalized rows, pagination state, counts, and terminal disposition. A page limit is `PAGE_LIMIT_REACHED`, not proof that the source is exhausted. The `--filters` argument is an annotation only; it does not add provider filters. Screen against `cutoff_date` yourself and record exclusions.
+Execution IDs are unique. Each new API execution records raw data, normalized rows, pagination state, counts, terminal disposition, the effective request URL with contact email redacted, and SHA-256 digests of returned raw payloads inside `parameters_json`. A page limit is `PAGE_LIMIT_REACHED`, not proof that the source is exhausted. `--filters` is rejected because provider-side filters are not implemented. In manually logged executions, `filters` describes operator-supplied context and does not prove that a provider applied a filter. Screen against `cutoff_date` yourself and record exclusions.
 
 Ingestion preserves discovery routes and uses DOI, arXiv ID, or normalized title/year for candidate matching. Ambiguous identity collisions stop ingestion. Title/year matching is heuristic; inspect possible false merges and edition/version differences. Ingested candidates remain `UNVERIFIED` until inspected.
 
@@ -83,14 +83,14 @@ Keep an initial cold pass separate from externally supplied candidate lists. Aft
 
 ## 6. Inspect evidence and code it
 
-Open the primary source. Examine its intervention, comparison, held constants, outcomes, tables, and limitations. Copy `examples/evidence.json`, replace the synthetic contents, and supply the existing candidate ID and your claim ID.
+Open the primary source. Examine its intervention, comparison, held constants, outcomes, tables, and limitations. Copy `examples/evidence.json`, replace the synthetic contents, and supply the existing candidate ID and your claim ID. Put the exact inspected version or edition in `primary_source` and `evidence_location`; the candidate's publication year may refer to an earlier version. Confirm exact publication timing when the source and cutoff share a year.
 
 ```sh
 python3 scripts/add_evidence.py /path/to/evidence.json
 python3 scripts/validate_records.py
 ```
 
-Supply `criteria_json` as a JSON-encoded string, as shown in the example. Missing evidence is `UNKNOWN` or an explicit uncertainty, not a positive match. The import assigns provisional authority and derives the mandatory review requirement. It refuses to import a human decision as a new proposal.
+Supply `criteria_json` as a JSON-encoded string, as shown in the example. Missing evidence is `UNKNOWN` or an explicit uncertainty, not a positive match. Scores 4–5 require manipulation, comparison, held constants, and observable. The importer rejects duplicate paper/experiment/claim loci and post-cutoff publication years for proposed precedence. Exact dates, source revisions, and judgment quality still require inspection. It assigns provisional authority and requires human review for scores 4–5 and all precedence or partial-precedence proposals. It refuses to import a human decision as a new proposal.
 
 ## 7. Obtain and record human review
 
@@ -119,9 +119,18 @@ Maintain the round, trigger, coverage, candidate-family, and evidence records de
 python3 scripts/check_stopping_rule.py
 ```
 
-This checks the declared round counts and reports whether the last two consecutive rounds meet the computational null condition. Exit code 0 means the records are consistent; it does **not** mean stopping is satisfied. Unreviewed candidates, pending human review, and blocked sources remain separate gates for the researcher. There is no automatic final novelty verdict.
+This checks the declared round counts and reports whether the last two consecutive rounds meet the computational null condition. Each round must have linked queries and source executions whose terminal states support completion; capped, failed, and manually stopped executions prevent a complete round. Human-adjudicated scores are used when present. Exit code 0 means the records are consistent; it does **not** mean stopping is satisfied. Unreviewed candidates and pending human review remain separate gates for the researcher. There is no automatic final novelty verdict.
 
 Write the final report using `templates/REPORT.md`. State the search dates, sources, cutoff, closest precedent, unresolved gaps, and remaining differences.
+
+After the report and all records are final, seal the full workspace and verify it before sharing a snapshot:
+
+```sh
+python3 scripts/seal_study.py
+python3 scripts/seal_study.py --verify
+```
+
+The report seal covers candidate and evidence records, raw responses, reviews, and reports. It is separate from the pre-search control freeze. Any later file change invalidates the seal; archive the seal outside the workspace for stronger provenance. Hashes establish byte consistency, not that a search or judgment was correct.
 
 ## Provider notes
 

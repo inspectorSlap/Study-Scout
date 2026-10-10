@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import os
 import time
@@ -35,6 +36,14 @@ LEDGER_FIELDS = [
 ]
 RESULT_FIELDS = ["source_position", "title", "authors", "year", "venue", "url", "doi", "arxiv_id", "external_id", "peer_reviewed_hint", "raw_record_path"]
 USER_AGENT = "StudyScout/0.1"
+
+
+def safe_request_url(url: str) -> str:
+    """Keep the effective query while omitting contact email from audit records."""
+    parts = urllib.parse.urlsplit(url)
+    query = urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+    redacted = [(key, "REDACTED" if key.lower() == "mailto" else value) for key, value in query]
+    return urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(redacted)))
 
 
 @dataclass(frozen=True)
@@ -225,7 +234,7 @@ def main() -> int:
     parser.add_argument("--execution-id")
     parser.add_argument("--page-size", type=int, default=50)
     parser.add_argument("--max-pages", type=int, default=2)
-    parser.add_argument("--filters", default="", help="Annotation only; does not filter provider results")
+    parser.add_argument("--filters", default="", help="Reserved; provider filters are not implemented")
     args = parser.parse_args()
 
     if args.list_sources:
@@ -238,6 +247,8 @@ def main() -> int:
         parser.error("invalid StudyScout execution ID")
     if not 1 <= args.page_size <= 100 or not 1 <= args.max_pages <= 100:
         parser.error("page size and page count must be in 1..100")
+    if args.filters:
+        parser.error("--filters is not implemented for API retrieval; document selection criteria in study notes")
 
     queries = {row["query_id"]: row for row in read_csv(QUERIES)}
     if args.query_id not in queries:
@@ -270,6 +281,7 @@ def main() -> int:
     initial_token = token
     rows: list[dict[str, str]] = []
     raw_paths: list[str] = []
+    request_receipts: list[dict[str, str | None]] = []
     total: int | None = None
     terminal, status, api_failure, api_truncated, notes = "PENDING", "COMPLETE", "FALSE", "FALSE", ""
     pages = 0
@@ -286,11 +298,15 @@ def main() -> int:
             if number > 1:
                 time.sleep(3.1)
             url = source.build_url(query["query_text"], args.page_size, token, contact)
+            receipt: dict[str, str | None] = {"url_with_contact_redacted": safe_request_url(url), "raw_path": None, "sha256": None}
+            request_receipts.append(receipt)
             with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=45) as response:
                 payload = response.read()
             raw_relative = Path("data/searches/raw") / args.execution_id / f"page-{number:04d}.{args.source}.{source.extension}"
             (RAW.parent.parent.parent / raw_relative).write_bytes(payload)
             raw_paths.append(raw_relative.as_posix())
+            receipt["raw_path"] = raw_relative.as_posix()
+            receipt["sha256"] = hashlib.sha256(payload).hexdigest()
             if payload.lstrip().lower().startswith((b"<!doctype html", b"<html")):
                 raise PermissionError("API returned an HTML access challenge")
             page = source.parse(payload, raw_relative.as_posix(), args.page_size, len(rows))
@@ -298,7 +314,10 @@ def main() -> int:
             pages += 1
             total = page.total if page.total is not None else total
             if page.exhausted:
-                terminal = "SOURCE_EXHAUSTED"
+                if total is not None and len(rows) < total:
+                    terminal, api_truncated = "API_TRUNCATED", "TRUE"
+                else:
+                    terminal = "SOURCE_EXHAUSTED"
                 break
             token = page.next_token or token
             if page.capped:
@@ -322,10 +341,10 @@ def main() -> int:
     append_rows(LEDGER, LEDGER_FIELDS, [{
         "execution_id": args.execution_id, "query_id": args.query_id, "stage": query["stage"],
         "source_id": source.source_id, "source_name": source.name, "access_method": "API",
-        "parameters_json": json.dumps({"page_size": args.page_size, "max_pages": args.max_pages, "timeout_seconds": 45}, sort_keys=True, separators=(",", ":")),
+        "parameters_json": json.dumps({"page_size": args.page_size, "max_pages": args.max_pages, "timeout_seconds": 45, "contact_email_supplied": bool(contact), "requests": request_receipts}, sort_keys=True, separators=(",", ":")),
         "filters": args.filters, "run_started_at": started, "run_completed_at": now(), "requested_page_size": str(args.page_size),
         "pagination_start": initial_token, "pagination_end": token, "pages_retrieved": str(pages), "result_count": str(len(rows)),
-        "results_available": "" if total is None else str(total), "serious_candidate_count": "0", "api_failure": api_failure,
+        "results_available": "" if total is None else str(total), "serious_candidate_count": "", "api_failure": api_failure,
         "api_truncated": api_truncated, "terminal_condition": terminal, "status": status,
         "raw_response_paths": ";".join(raw_paths), "normalized_result_paths": result_relative, "notes": notes,
     }])

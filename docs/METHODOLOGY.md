@@ -31,13 +31,13 @@ The default equivalence rubric is:
 
 A score is a proposal, not a probability. The public v0.1 fixes the 0–5 scale and review threshold; study-specific comparison dimensions are configurable. Changing the scoring policy itself requires an explicit software/protocol revision.
 
-Allowed statuses: `PRECEDED`, `PARTIALLY_PRECEDED`, `ADJACENT`, `NOT_RELEVANT`, `UNCERTAIN`. Scores 4–5 and every `PRECEDED` proposal require human review. Primary-source access gaps should be visible. Neither source metadata nor a provider's publication type establishes peer review or experimental equivalence.
+Allowed statuses: `PRECEDED`, `PARTIALLY_PRECEDED`, `ADJACENT`, `NOT_RELEVANT`, `UNCERTAIN`. Scores 4–5 and every `PRECEDED` or `PARTIALLY_PRECEDED` proposal require human review. A high-equivalence `UNCERTAIN` row can be a close test whose result does not establish the claim; the review packet calls out this distinction. Do not relabel such a result `CONTRADICTED` unless the implementation, comparator, and outcome justify that stronger claim. Primary-source access gaps should be visible. Neither source metadata nor a provider's publication type establishes peer review or experimental equivalence.
 
 ## Coverage and stopping
 
 Expand through backward citations, forward citations, authors, and terminology. Record each expansion's parents and execution, including zero-result searches and failures. A source cap, access block, or local page budget is not exhaustion.
 
-The computational rule checks two consecutive complete rounds without new high-equivalence candidates or productive families. A productive family is a newly recorded family containing a new candidate with provisional score at least 3; high-equivalence means at least 4. Each round needs a nonempty frozen trigger set and completed coverage along all four paths. The script verifies counts against the records supplied; it cannot determine whether unrecorded literature or uninspected candidates would change them.
+The computational rule checks two consecutive complete rounds without new high-equivalence candidates or productive families. A productive family is a newly recorded family containing a new candidate with effective score at least 3; high-equivalence means at least 4, or an effective `PRECEDED` status. Human-adjudicated scores replace proposals in these counts. Each round needs a nonempty trigger set, completed coverage along all four paths, and recorded round queries with completed source executions. A failed, capped, or manually stopped execution cannot support a `COMPLETE` coverage claim. The script verifies counts against the records supplied; it cannot determine whether unrecorded literature or uninspected candidates would change them.
 
 Before closing, separately resolve or disclose pending screening, mandatory reviews, missing sources, and calibration failures. The generated matrix is a navigation aid, not a complete review report or proof of exhaustive search.
 

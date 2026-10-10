@@ -1,5 +1,6 @@
 """Offline acceptance and negative-control tests; no real provider requests."""
 import csv
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -49,6 +50,15 @@ class Workflow(unittest.TestCase):
     def rows(self, relative):
         with (self.workspace / 'data' / relative).open(newline='') as handle:
             return list(csv.DictReader(handle))
+
+    def replace_rows(self, relative, rows):
+        path = self.workspace / 'data' / relative
+        with path.open(newline='') as handle:
+            fields = csv.DictReader(handle).fieldnames
+        with path.open('w', newline='') as handle:
+            writer = csv.DictWriter(handle, fieldnames=fields, lineterminator='\n')
+            writer.writeheader()
+            writer.writerows(rows)
 
     def test_empty_workspace_valid_but_network_blocked(self):
         self.run_script('validate_records')
@@ -109,6 +119,104 @@ class Workflow(unittest.TestCase):
         self.run_script('add_evidence', path, ok=False)
         self.assertFalse(self.rows('coding/evidence-matrix.csv'))
 
+    def test_partial_precedence_requires_review_and_duplicate_locus_is_rejected(self):
+        self.ingest()
+        record = json.loads((ROOT / 'examples/evidence.json').read_text())
+        record['equivalence_score'] = '3'
+        path = Path(self.temp.name) / 'partial.json'
+        path.write_text(json.dumps(record))
+        self.run_script('add_evidence', path)
+        self.assertEqual(self.rows('coding/evidence-matrix.csv')[0]['manual_review_required'], 'TRUE')
+        record['evidence_id'] = 'EV-000002'
+        path.write_text(json.dumps(record))
+        self.run_script('add_evidence', path, ok=False)
+        self.assertEqual(len(self.rows('coding/evidence-matrix.csv')), 1)
+
+    def test_validator_rejects_missing_source_and_inconsistent_screening(self):
+        self.ingest()
+        self.run_script('add_evidence', ROOT / 'examples/evidence.json')
+        evidence = self.rows('coding/evidence-matrix.csv')
+        evidence[0]['primary_source'] = ''
+        self.replace_rows('coding/evidence-matrix.csv', evidence)
+        self.run_script('validate_records', ok=False)
+        evidence[0]['primary_source'] = 'Synthetic source'
+        self.replace_rows('coding/evidence-matrix.csv', evidence)
+        candidate = self.rows('corpus/candidates.csv')[0]
+        self.replace_rows('corpus/screening.csv', [{'paper_id': candidate['paper_id'], 'title': candidate['title'],
+            'decision': 'EXCLUDED', 'basis': 'unrelated', 'date_utc': '2026-01-01'}])
+        self.run_script('validate_records', ok=False)
+
+    def test_post_cutoff_candidate_cannot_be_coded_as_precedent(self):
+        self.ingest()
+        candidates = self.rows('corpus/candidates.csv')
+        candidates[0]['year'] = '2026'
+        self.replace_rows('corpus/candidates.csv', candidates)
+        record = json.loads((ROOT / 'examples/evidence.json').read_text())
+        record.update(status='PRECEDED', equivalence_score='5')
+        path = Path(self.temp.name) / 'post-cutoff.json'
+        path.write_text(json.dumps(record))
+        self.run_script('add_evidence', path, ok=False)
+
+    def test_final_seal_detects_changed_and_added_files(self):
+        self.ingest()
+        self.run_script('seal_study')
+        self.run_script('seal_study', '--verify')
+        candidate_path = self.workspace / 'data/corpus/candidates.csv'
+        original = candidate_path.read_bytes()
+        candidate_path.write_bytes(original + b'\n')
+        self.run_script('seal_study', '--verify', ok=False)
+        candidate_path.write_bytes(original)
+        (self.workspace / 'extra.txt').write_text('new')
+        self.run_script('seal_study', '--verify', ok=False)
+
+    def test_reported_total_cannot_be_logged_as_source_exhausted(self):
+        self.prepare()
+        self.run_script('log_retrieval', '--execution-id', 'R-S1-000001', '--query-id', 'Q-S1-000001',
+            '--source-id', 'S-02', '--pages', '1', '--result-count', '1', '--results-available', '50',
+            '--terminal', 'SOURCE_EXHAUSTED', '--status', 'COMPLETE')
+        self.run_script('validate_records', ok=False)
+
+    def test_stopping_uses_adjudicated_score_and_round_retrieval(self):
+        self.ingest()
+        self.run_script('add_evidence', ROOT / 'examples/evidence.json')
+        evidence = self.rows('coding/evidence-matrix.csv')
+        evidence[0].update(adjudication_authority='HUMAN_ADJUDICATED', adjudicated_equivalence_score='1',
+                           adjudicated_status='ADJACENT', manual_review_status='REVISED')
+        self.replace_rows('coding/evidence-matrix.csv', evidence)
+        candidates = self.rows('corpus/candidates.csv')
+        candidates[0]['first_seen_round_id'] = 'ROUND-S1-001'
+        self.replace_rows('corpus/candidates.csv', candidates)
+        rounds = []
+        coverage = []
+        triggers = []
+        for ordinal in (1, 2):
+            round_id = f'ROUND-S1-{ordinal:03d}'
+            rounds.append(dict(round_id=round_id, stage='STAGE_1_COLD', ordinal=str(ordinal),
+                completed_at='2026-01-01', trigger_paper_count='1', new_candidates_count='1' if ordinal == 1 else '0',
+                new_provisional_ge4_count='0', new_productive_family_count='0', complete='TRUE', machine_null='TRUE'))
+            coverage.append(dict(coverage_id=f'COV-S1-{ordinal:06d}', round_id=round_id,
+                paper_id='P-000001', backward_status='COMPLETE', forward_status='COMPLETE',
+                author_status='COMPLETE', terminology_status='COMPLETE'))
+            triggers.append(dict(round_id=round_id, paper_id='P-000001'))
+        self.replace_rows('searches/expansion-rounds.csv', rounds)
+        self.replace_rows('searches/expansion-coverage.csv', coverage)
+        self.replace_rows('searches/round-triggers.csv', triggers)
+        for ordinal in (1, 2):
+            query_id = f'Q-S1-{ordinal + 1:06d}'
+            self.run_script('register_query', '--query-id', query_id, '--origin', 'TERMINOLOGY',
+                '--query', f'synthetic followup {ordinal}', '--track', 'terminology', '--claims', 'C1',
+                '--generation', '1', '--parent-query-id', 'Q-S1-000001',
+                '--expansion-round-id', f'ROUND-S1-{ordinal:03d}')
+            self.run_script('log_retrieval', '--execution-id', f'R-S1-{ordinal + 1:06d}',
+                '--query-id', query_id, '--source-id', 'S-02', '--pages', '1', '--result-count', '0',
+                '--results-available', '0', '--terminal', 'SOURCE_EXHAUSTED', '--status', 'COMPLETE')
+        self.assertIn('STOPPING CONDITION SATISFIED;', self.run_script('check_stopping_rule').stdout)
+        ledger = self.rows('searches/retrieval-ledger.csv')
+        ledger[-1]['terminal_condition'] = 'PAGE_LIMIT_REACHED'
+        self.replace_rows('searches/retrieval-ledger.csv', ledger)
+        self.run_script('check_stopping_rule', '--write-status', 'synthesis/invalid.md', ok=False)
+        self.assertFalse((self.workspace / 'data/synthesis/invalid.md').exists())
+
     def test_no_rounds_does_not_satisfy_stopping(self):
         result = self.run_script('check_stopping_rule')
         self.assertIn('NOT SATISFIED', result.stdout)
@@ -153,6 +261,29 @@ class Retrieval(unittest.TestCase):
         row = self.rows('searches/retrieval-ledger.csv')[0]
         self.assertEqual(row['terminal_condition'], 'PAGE_LIMIT_REACHED')
         self.assertEqual(row['result_count'], '1')
+        receipt = json.loads(row['parameters_json'])['requests'][0]
+        self.assertEqual(receipt['sha256'], hashlib.sha256(payload).hexdigest())
+        self.assertIn('query.bibliographic=', receipt['url_with_contact_redacted'])
+
+    def test_provider_total_prevents_false_exhaustion(self):
+        payload = b'{"message":{"items":[],"total-results":50}}'
+        self.assertEqual(self.mocked_request(payload), 0)
+        row = self.rows('searches/retrieval-ledger.csv')[0]
+        self.assertEqual(row['terminal_condition'], 'API_TRUNCATED')
+        self.assertEqual(row['api_truncated'], 'TRUE')
+
+    def test_request_receipt_redacts_contact_email(self):
+        url = api_search.openalex_url('synthetic query', 10, '*', 'private@example.org')
+        safe = api_search.safe_request_url(url)
+        self.assertNotIn('private@example.org', safe)
+        self.assertIn('REDACTED', safe)
+
+    def test_unapplied_api_filters_are_rejected(self):
+        with patch.object(sys, 'argv', ['api_search.py', '--source', 'crossref', '--query-id', 'Q-S1-000001',
+                                         '--execution-id', 'R-S1-000001', '--filters', 'year:2020']):
+            with self.assertRaises(SystemExit) as caught:
+                api_search.main()
+        self.assertEqual(caught.exception.code, 2)
 
     def test_rate_limit_remains_failed_execution(self):
         error = urllib.error.HTTPError('https://example.org',429,'Too Many Requests',{},None)

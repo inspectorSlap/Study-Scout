@@ -5,8 +5,8 @@ import json
 import re
 from collections import Counter
 from datetime import date
-from rig_common import ROOT, DATA, CONTROL, CONFIG, CLAIM_IDS, STAGES, STATUSES, QUERY_ORIGINS, TERMINALS, read_csv, split_claim_ids
-from schemas import SCHEMAS, ID_RULES
+from rig_common import ROOT, DATA, CONTROL, CONFIG, CLAIM_IDS, STAGES, STATUSES, QUERY_ORIGINS, TERMINALS, read_csv, review_required, split_claim_ids
+from schemas import SCHEMAS, ID_RULES, OPTIONAL_SCHEMAS
 from init_study import validate_config
 
 
@@ -29,6 +29,22 @@ def validate():
             errors.append(f'{name}: {type(exc).__name__}')
     if errors:
         return errors
+    for name, fields in OPTIONAL_SCHEMAS.items():
+        path = DATA / name
+        if not path.exists():
+            continue
+        try:
+            with path.open(newline='', encoding='utf-8') as handle:
+                reader = csv.DictReader(handle)
+                rows = list(reader)
+                if reader.fieldnames != fields or any(None in row or None in row.values() for row in rows):
+                    errors.append(f'{name}: schema or row-width mismatch')
+                else:
+                    records[name] = rows
+        except (OSError, csv.Error) as exc:
+            errors.append(f'{name}: {type(exc).__name__}')
+    if errors:
+        return errors
     for name, (field, pattern) in ID_RULES.items():
         values = [row[field] for row in records[name]]
         if any(not re.fullmatch(pattern, value) for value in values):
@@ -40,6 +56,11 @@ def validate():
     papers = {r['paper_id']: r for r in records['corpus/candidates.csv']}
     edges = {r['edge_id']: r for r in records['searches/citation-chains.csv']}
     ledger = {r['execution_id']: r for r in records['searches/retrieval-ledger.csv']}
+    for row in papers.values():
+        if row['year'] and not re.fullmatch(r'\d{4}', row['year']):
+            errors.append(f"{row['paper_id']}: candidate year must be four digits")
+        if row['disposition'] == 'EXCLUDED' and not row['rejection_reason'].strip():
+            errors.append(f"{row['paper_id']}: excluded candidate lacks a reason")
     for number, row in enumerate(seeds.values(), 1):
         if row['ordinal'] != str(number) or not row['query_text'].strip() or not row['track'].strip():
             errors.append(f"{row['seed_id']}: invalid ordinal or empty query/track")
@@ -76,6 +97,8 @@ def validate():
             errors.append('derived query lacks valid generation/parents')
         if row['query_origin'] == 'INJECTED' and row['stage'] == 'STAGE_1_COLD':
             errors.append('injected query entered cold stage')
+        if row['expansion_round_id'] and row['expansion_round_id'] not in {r['round_id'] for r in records['searches/expansion-rounds.csv']}:
+            errors.append('query references unknown expansion round')
     try:
         sources = {r['source_id'] for r in read_csv(CONTROL / 'SOURCE_REGISTER.csv')}
     except (OSError, KeyError):
@@ -89,13 +112,38 @@ def validate():
             errors.append('invalid retrieval terminal/status')
         if row['terminal_condition'] in ('API_FAILURE','RATE_LIMITED') and row['status'] != 'FAILED':
             errors.append('retrieval failure reported as success')
-        for field in ('pages_retrieved','result_count','requested_page_size','serious_candidate_count'):
+        for field in ('pages_retrieved','result_count','requested_page_size'):
             if not row[field].isdigit():
                 errors.append(f'invalid retrieval count: {field}')
+        if row['serious_candidate_count'] and not row['serious_candidate_count'].isdigit():
+            errors.append('invalid retrieval count: serious_candidate_count')
+        if row['terminal_condition'] == 'SOURCE_EXHAUSTED' and row['result_count'].isdigit() and row['results_available'].isdigit() and int(row['result_count']) < int(row['results_available']):
+            errors.append(f"{row['execution_id']}: source exhausted conflicts with provider total")
+    if 'corpus/screening.csv' in records:
+        seen_screening = set()
+        for row in records['corpus/screening.csv']:
+            paper_id = row['paper_id']
+            if paper_id in seen_screening or paper_id not in papers:
+                errors.append(f'{paper_id}: duplicate or unknown screening paper')
+            else:
+                candidate = papers[paper_id]
+                if row['decision'] != candidate['disposition']:
+                    errors.append(f'{paper_id}: screening decision disagrees with candidate disposition')
+                if row['title'] != candidate['title']:
+                    errors.append(f'{paper_id}: screening title disagrees with candidate title')
+                if row['decision'] == 'EXCLUDED' and (not row['basis'].strip() or row['basis'] != candidate['rejection_reason']):
+                    errors.append(f'{paper_id}: exclusion basis disagrees with candidate reason')
+                if row['date_utc']:
+                    try:
+                        date.fromisoformat(row['date_utc'])
+                    except ValueError:
+                        errors.append(f'{paper_id}: invalid screening date')
+            seen_screening.add(paper_id)
     for row in records['corpus/discoveries.csv']:
         execution = ledger.get(row['execution_id'])
         if row['paper_id'] not in papers or not execution or row['query_id'] != execution['query_id'] or row['stage'] != execution['stage']:
             errors.append('invalid discovery relationship')
+    seen_loci = set()
     for row in records['coding/evidence-matrix.csv']:
         label = row['evidence_id']
         if row['paper_id'] not in papers or row['claim_id'] not in CLAIM_IDS or row['stage'] not in STAGES:
@@ -103,15 +151,26 @@ def validate():
         if row['status'] not in STATUSES or not row['equivalence_score'].isdigit() or int(row['equivalence_score']) > 5:
             errors.append(f'{label}: invalid status/score')
             continue
+        locus = (row['paper_id'], row['experiment_id'], row['claim_id'])
+        if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*', row['experiment_id']) or locus in seen_loci:
+            errors.append(f'{label}: invalid or duplicate paper/experiment/claim locus')
+        seen_loci.add(locus)
         try:
             criteria = json.loads(row['criteria_json'])
             if not isinstance(criteria, dict) or set(criteria) != set(CONFIG['criteria']):
                 errors.append(f'{label}: criteria_json must cover configured criteria exactly')
+            elif any(not isinstance(value, str) or not value.strip() for value in criteria.values()):
+                errors.append(f'{label}: criteria_json values must be nonempty text')
         except ValueError:
             errors.append(f'{label}: malformed criteria_json')
-        if not row['evidence_location'] or not row['coder_inference']:
-            errors.append(f'{label}: evidence location and reasoning are required')
-        required = int(row['equivalence_score']) >= 4 or row['status'] == 'PRECEDED'
+        if any(not row[field] for field in ('primary_source', 'verification_state', 'evidence_location', 'coder_inference')):
+            errors.append(f'{label}: primary source, verification state, evidence location, and reasoning are required')
+        if int(row['equivalence_score']) >= 4 and any(not row[field] for field in ('manipulation', 'comparison', 'held_constants', 'observable')):
+            errors.append(f'{label}: scores 4–5 require experimental detail')
+        year = papers.get(row['paper_id'], {}).get('year', '')
+        if row['status'] in ('PRECEDED', 'PARTIALLY_PRECEDED') and year.isdigit() and int(year) > int(CONFIG['cutoff_date'][:4]):
+            errors.append(f'{label}: post-cutoff candidate cannot be a precedent')
+        required = review_required(row)
         if row['manual_review_required'] != ('TRUE' if required else 'FALSE'):
             errors.append(f'{label}: inconsistent mandatory review flag')
         if required:

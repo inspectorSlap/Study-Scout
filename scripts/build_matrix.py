@@ -7,7 +7,7 @@ import argparse
 from collections import defaultdict
 from pathlib import Path
 
-from rig_common import CLAIM_IDS, DATA, ROOT, read_csv
+from rig_common import CLAIM_IDS, DATA, ROOT, effective_judgment, read_csv
 from report_scope import scope_lines
 
 
@@ -19,10 +19,8 @@ def escape(value: str) -> str:
 
 
 def rank(row):
-    human = row['adjudication_authority'] == 'HUMAN_ADJUDICATED'
-    score = row['adjudicated_equivalence_score'] if human else row['equivalence_score']
-    status = row['adjudicated_status'] if human else row['status']
-    return int(score), ORDER[status], row['evidence_id']
+    score, status = effective_judgment(row)
+    return score, ORDER[status], row['evidence_id']
 
 
 def main() -> int:

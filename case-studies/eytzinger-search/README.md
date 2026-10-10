@@ -4,7 +4,7 @@
 
 Eytzinger layout stores a binary search tree breadth-first in an array. The question here is deliberately narrower than “is it fast?”: does the literature test a specific implementation, comparator, working-set size, and concurrency setting?
 
-**Read the results within these bounds:** 49 candidate records include 13 awaiting full text. Of eight recorded retrieval executions, five hit a page limit, two were manually stopped, and one was rate-limited. Two human reviews remain pending; no expansion rounds were completed, and stopping is **NOT SATISFIED**. The findings below are provisional judgments about inspected sources, not a completeness claim.
+**Read the results within these bounds:** 49 candidate records include 13 awaiting full text. Of eight recorded retrieval executions, five hit a page limit, two were manually stopped, and one was rate-limited. Three human reviews remain pending; no expansion rounds were completed, and stopping is **NOT SATISFIED**. The findings below are provisional judgments about inspected sources, not a completeness claim.
 
 ## What the run found
 
@@ -13,7 +13,7 @@ Eytzinger layout stores a binary search tree breadth-first in an array. The ques
 | C1: Eytzinger with branch-free traversal and prefetch can beat optimized sorted binary search above last-level cache | **PRECEDED, 5/5 — human review pending** | Khuong and Morin's Figure 22 includes the specified comparison. |
 | C2: the same implementation retains that advantage with concurrent readers | **Unresolved** | The earlier paper's threaded figure uses a Btree comparator. A later, close comparison reports near parity under a different batched implementation. |
 
-Read the [evidence report](REPORT.md), then inspect the generated [matrix](snapshot/data/synthesis/matrix.md) and [pending review packet](snapshot/data/reviews/BATCH-001.md). Scores measure experimental correspondence, not confidence or effect size. A close experiment can fail to support the proposed result: EV-000003 deliberately records 4/5 with `UNCERTAIN`.
+Read the [evidence report](REPORT.md), then inspect the generated [matrix](snapshot/data/synthesis/matrix.md) and [pending review packets](snapshot/data/reviews/BATCH-001.md) ([additional partial-precedence review](snapshot/data/reviews/BATCH-002.md)). Scores measure experimental correspondence, not confidence or effect size. A close experiment can fail to support the proposed result: EV-000003 deliberately records 4/5 with `UNCERTAIN`.
 
 The useful result is the distinction between a topic match and an experiment match. “The paper discusses threads” is insufficient when its plotted comparator differs from the claim.
 
@@ -36,11 +36,13 @@ Use a new destination; the command refuses to overwrite an existing workspace. I
 - 50 API result routes yielding 48 distinct bibliographic records, plus one original benchmark report imported from web search: **49 candidate records**, not 49 independent studies.
 - [Screening decisions](snapshot/data/corpus/screening.csv): 33 exclusions at title/metadata level, 13 leads awaiting full text, and three included records representing two research families. The preprint and journal entries belong to the same family.
 - Three initial web queries in one merged response (39 visible leads), and one registered follow-up (24 visible leads). Web leads are separate from the API corpus count. Only the selected follow-up report was imported.
-- Three evidence proposals, two pending mandatory reviews, and **stopping NOT SATISFIED**.
+- Three evidence proposals, three pending mandatory reviews under the current review rule, and **stopping NOT SATISFIED**.
 
 ## Limits worth reading before sharing
 
 This was one agent-assisted worked example with prior general knowledge of the topic, not two independent agents or a blinded discovery evaluation. The schema's `STAGE_1_COLD` label means no injected candidate list was used; it does not prove model ignorance or process isolation. No human has adjudicated the proposals.
+
+The operator did not know the Eytzinger result in advance. The central paper entered as OpenAlex position 2 for a frozen seed query; the [discovery route](snapshot/data/corpus/discoveries.csv) records this. The agent's general topic knowledge is disclosed because it may shape search terms, not because the paper was supplied or the result was known.
 
 The one-page API budget left five capped executions; one OpenAlex request was rate-limited. Crossref returned mostly unrelated metadata. These are retained, not cleaned into an artificially successful search. Thirteen corpus leads remain unresolved, most web leads were not inspected in full, and no complete expansion rounds were claimed. The search stopped early within its maximum budget after finding contrasting examples. This is not saturation, a systematic review, or evidence that C2 is novel or false everywhere.
 

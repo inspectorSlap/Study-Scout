@@ -15,10 +15,10 @@ Figure 22 (printed p.38; PDF p.41) compares prefetched, branch-free Eytzinger an
 ## Reading the judgments
 
 - EV-000001: C1, **5 / PRECEDED**, requires human review.
-- EV-000002: C2, **3 / PARTIALLY_PRECEDED**, missing decisive comparator in the inspected threaded figure.
+- EV-000002: C2, **3 / PARTIALLY_PRECEDED**, missing decisive comparator in the inspected threaded figure; requires human review under the current rule.
 - EV-000003: C2, **4 / UNCERTAIN**, close experiment with a different implementation and an outcome that does not establish the claimed advantage; requires human review.
 
-All three are agent proposals. No benchmark was executed locally and no reviewer acceptance was invented. The matrix's lack of a mandatory review flag for the score-3 row does not make it human-approved.
+All three are agent proposals. No benchmark was executed locally and no reviewer acceptance was invented. The 2015 year on P-000012 is candidate metadata for the preprint family; both evidence rows cite the inspected 2017 arXiv v2 manuscript. The evidence locations and source URLs, not the candidate year alone, identify the material supporting these judgments.
 
 ## Coverage and unresolved work
 
@@ -26,4 +26,4 @@ The study controls were frozen before this task's retrieval; topic selection was
 
 The corpus screening table includes unresolved computing papers, rather than rejecting them for lack of inspection. The preprint/journal pair is linked by FAM-001 and coded once. Dates on selected sources precede the cutoff; unresolved records with only year metadata are not assumed to pass exact-date screening.
 
-This run demonstrates retrieval, provenance, experiment comparison, and review preparation. It does not demonstrate exhaustive coverage, calibrated recall, independent agent agreement, or completed human adjudication. The generated stopping report correctly remains **NOT SATISFIED**. Finish the unresolved leads, source failures, and expansion rounds before making a broader literature claim.
+This run demonstrates retrieval, provenance, experiment comparison, and review preparation. It does not demonstrate exhaustive coverage, calibrated recall, independent agent agreement, or completed human adjudication. Expansion rounds, citation chains, and round coverage remain unexercised in this live case; their stopping logic has only offline fixture tests. The generated stopping report correctly remains **NOT SATISFIED**. Finish the unresolved leads, source failures, and expansion rounds before making a broader literature claim.
