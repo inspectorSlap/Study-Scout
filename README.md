@@ -2,9 +2,9 @@
 
 **Find the work that challenges your research claim—and keep the evidence trail.**
 
-StudyScout is a Python toolkit and agent-assisted workflow for adversarial literature review. Define your claims and comparison criteria, record how you searched, inspect the closest experimental evidence, and preserve both provisional judgments and human decisions.
+Study Scout is a Python toolkit and agent-assisted workflow for adversarial literature review. Define your claims and comparison criteria, record how you searched, inspect the closest experimental evidence, and preserve both provisional judgments and human decisions.
 
-The goal is to identify the strongest precedent for a claim. StudyScout deliberately has no `NOVEL` verdict: its conclusions are bounded by the sources, evidence, and cutoff date of a particular search.
+The goal is to identify the strongest precedent for a claim. Study Scout deliberately has no `NOVEL` verdict: its conclusions are bounded by the sources, evidence, and cutoff date of a particular search.
 
 ## What it does
 
@@ -68,7 +68,7 @@ See the [implementation guide](docs/IMPLEMENTATION.md) for the complete command 
 
 Adapters are included for OpenAlex, Crossref, Semantic Scholar, arXiv, and DBLP. Live availability, credentials, and rate limits depend on the provider. Read [provider notes](docs/IMPLEMENTATION.md#provider-notes) before making requests. Search text is transmitted to the provider you select.
 
-StudyScout saves raw responses and normalized metadata in the research workspace. New API executions record the effective request with contact email redacted and hashes of raw payloads. Full-text inspection and evidence coding are separate steps. The configured cutoff date must be checked during screening; the adapters do not automatically enforce exact publication dates.
+Study Scout saves raw responses and normalized metadata in the research workspace. New API executions record the effective request with contact email redacted and hashes of raw payloads. Full-text inspection and evidence coding are separate steps. The configured cutoff date must be checked during screening; the adapters do not automatically enforce exact publication dates.
 
 ## Development
 
