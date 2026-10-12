@@ -1,6 +1,6 @@
 # Contributing
 
-StudyScout values reproducible research records and explicit uncertainty.
+Study Scout values reproducible research records and explicit uncertainty.
 
 For bugs, include the Python version, command, expected behavior, and a minimal synthetic reproduction. Do not attach private research workspaces, API keys, unpublished claims, or full-text papers to public issues.
 
