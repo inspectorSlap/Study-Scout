@@ -1,6 +1,6 @@
 # Architecture and extension
 
-StudyScout 0.1 is a collection of standard-library Python scripts. The public toolkit is separate from a private study workspace. No model SDK, orchestration platform, or database is required.
+Study Scout 0.1 is a collection of standard-library Python scripts. The public toolkit is separate from a private study workspace. No model SDK, orchestration platform, or database is required.
 
 ```text
 study.json + seed queries + source register
