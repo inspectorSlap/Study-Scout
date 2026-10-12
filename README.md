@@ -1,4 +1,4 @@
-# StudyScout
+# Study Scout
 
 **Find the work that challenges your research claim—and keep the evidence trail.**
 
